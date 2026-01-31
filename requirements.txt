@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+psycopg2-binary
+pydantic_settings
+dotenv
+asyncpg
+passlib[bcrypt]
+cryptography
+sqlalchemy-utils
