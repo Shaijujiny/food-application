@@ -9,3 +9,5 @@ asyncpg
 passlib[bcrypt]
 cryptography
 sqlalchemy-utils
+redis==5.2.1
+PyJWT==2.10.1

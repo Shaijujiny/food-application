@@ -27,7 +27,9 @@ def get_database_url() -> str:
     port = CONFIG_SETTINGS.POSTGRESQL_DB_PORT or 5432
     db = CONFIG_SETTINGS.POSTGRESQL_DB_NAME or "postgres"
 
-    return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
+    connection= f"postgresql+asyncpg://shaijujin:shaiju123@127.0.0.1:5432/food"
+    print("connection configured successfully : ", connection)
+    return connection
 
 
 def init_engine(echo: bool = False) -> AsyncEngine:

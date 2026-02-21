@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from app.api import api_router
 from app.config import CONFIG_SETTINGS
 from contextlib import asynccontextmanager
-
+from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,5 +28,11 @@ app = FastAPI(
     root_path=CONFIG_SETTINGS.ROOT_PATH,
 )
 
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],    
+    allow_credentials=True,
+    allow_methods=["*"],            # IMPORTANT
+    allow_headers=["*"],
+)
 app.include_router(api_router)
