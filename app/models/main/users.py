@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional, Sequence
 from uuid import uuid4
 
 from sqlalchemy import Boolean, DateTime, Enum, Integer, String, select
@@ -14,6 +14,7 @@ from app.utils.schemas_utils import CustomModel
 class UserRole(str, enum.Enum):
     ADMIN = "ADMIN"
     CUSTOMER = "CUSTOMER"
+    DELIVERY_PARTNER = "DELIVERY_PARTNER"
 
 
 # ===============================
@@ -147,6 +148,14 @@ class TblUsers(Base):
         return result or 0
 
     @classmethod
+    async def get_role_stats(cls, db: AsyncSession):
+        from sqlalchemy import func
+
+        stmt = select(cls.role, func.count(cls.usr_id)).group_by(cls.role)
+        result = await db.execute(stmt)
+        return result.all()
+
+    @classmethod
     async def get_recent(
         cls, db: AsyncSession, limit: int = 5, role: Optional[UserRole] = None
     ):
@@ -163,7 +172,7 @@ class TblUsers(Base):
         skip: int = 0,
         limit: int = 10,
         role: Optional[UserRole] = None,
-    ) -> tuple[int, List["TblUsers"]]:
+    ) -> tuple[int, Sequence["TblUsers"]]:
         from sqlalchemy import func
 
         stmt = select(cls)

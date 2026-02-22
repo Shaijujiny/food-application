@@ -5,7 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.admin.schema import UpdateUserRequestModel
+from app.api.admin.schema import CreateUserRequestModel, UpdateUserRequestModel
 from app.api.admin.service import AdminUserService, DashboardService
 from app.database.postgresql import get_db
 from app.depends.jwt_depends import get_current_admin_user
@@ -28,6 +28,19 @@ async def admin_profile(
     current_admin=Depends(get_current_admin_user), lang: str = Depends(get_language)
 ):
     return await DashboardService.get_admin_profile(current_admin, lang)
+
+
+@router.post("/users")
+async def create_user(
+    req_data: CreateUserRequestModel,
+    db: AsyncSession = Depends(get_db),
+    current_admin=Depends(get_current_admin_user),
+    lang: str = Depends(get_language),
+):
+    """
+    Create a new user (Admin, Customer, or Delivery Partner).
+    """
+    return await AdminUserService.create_user(db, req_data.model_dump(), lang)
 
 
 @router.get("/users")

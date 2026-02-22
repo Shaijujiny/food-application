@@ -51,4 +51,29 @@ MESSAGES: dict[MessageCode, dict[str, str]] = {
         "ar": "المستخدم غير موجود",
         "hi": "उपयोगकर्ता नहीं मिला",
     },
+    MessageCode.ORDER_CREATED: {
+        "en": "Order created successfully",
+        "ar": "تم إنشاء الطلب بنجاح",
+        "hi": "ऑर्डर सफलतापूर्वक बनाया गया",
+    },
+    MessageCode.ORDERS_FETCHED: {
+        "en": "Orders fetched successfully",
+        "ar": "تم جلب الطلبات بنجاح",
+        "hi": "ऑर्डर सफलतापूर्वक प्राप्त किए गए",
+    },
+    MessageCode.ORDER_FETCHED: {
+        "en": "Order fetched successfully",
+        "ar": "تم جلب الطلب بنجاح",
+        "hi": "ऑर्डर सफलतापूर्वक प्राप्त किया गया",
+    },
+    MessageCode.ORDER_NOT_FOUND: {
+        "en": "Order not found",
+        "ar": "الطلب غير موجود",
+        "hi": "ऑर्डर नहीं मिला",
+    },
+    MessageCode.ORDER_STATUS_UPDATED: {
+        "en": "Order status updated successfully",
+        "ar": "تم تحديث حالة الطلب بنجاح",
+        "hi": "ऑर्डर की स्थिति सफलतापूर्वक अपडेट की गई",
+    },
 }

@@ -1,30 +1,25 @@
 # app/api/restaurants/service.py
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-
-from app.models.main.restaurants import RestaurantBaseModel, TblRestaurants
-
-from app.core.response.response_builder import ResponseBuilder
-from app.core.error.error_types import ErrorType
-from app.core.error.message_codes import MessageCode
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.restaurants.schema import (
     RestaurantCreate,
-    RestaurantUpdate,
     RestaurantResponse,
+    RestaurantUpdate,
 )
+from app.core.error.error_types import ErrorType
+from app.core.error.message_codes import MessageCode
+from app.core.response.response_builder import ResponseBuilder
+from app.models.main.restaurants import RestaurantBaseModel, TblRestaurants
 
 
 class RestaurantService:
-
     @staticmethod
     async def create(data: RestaurantCreate, db: AsyncSession, lang: str):
 
         restaurant = RestaurantBaseModel(
-            name=data.name,
-            address=data.address,
-            phone=data.phone
+            name=data.name, address=data.address, phone=data.phone, email=data.email
         )
 
         created = await TblRestaurants.create(restaurant, db)
@@ -35,7 +30,7 @@ class RestaurantService:
             ErrorType.SUC_201_CREATED,
             MessageCode.CUSTOMER_CREATED,  # Better: add RESTAURANT_CREATED
             lang,
-            data=RestaurantResponse.model_validate(created)
+            data=RestaurantResponse.model_validate(created),
         )
 
     @staticmethod
@@ -44,16 +39,10 @@ class RestaurantService:
         result = await db.execute(select(TblRestaurants))
         restaurants = result.scalars().all()
 
-        response_list = [
-            RestaurantResponse.model_validate(r)
-            for r in restaurants
-        ]
+        response_list = [RestaurantResponse.model_validate(r) for r in restaurants]
 
         return ResponseBuilder.build(
-            ErrorType.SUC_200_OK,
-            MessageCode.PROFILE_FETCHED,
-            lang,
-            data=response_list
+            ErrorType.SUC_200_OK, MessageCode.PROFILE_FETCHED, lang, data=response_list
         )
 
     @staticmethod
@@ -69,14 +58,14 @@ class RestaurantService:
             return ResponseBuilder.build(
                 ErrorType.RES_404_NOT_FOUND,
                 MessageCode.INVALID_CREDENTIALS,  # Better: add RESTAURANT_NOT_FOUND
-                lang
+                lang,
             )
 
         return ResponseBuilder.build(
             ErrorType.SUC_200_OK,
             MessageCode.PROFILE_FETCHED,
             lang,
-            data=RestaurantResponse.model_validate(restaurant)
+            data=RestaurantResponse.model_validate(restaurant),
         )
 
     @staticmethod
@@ -90,9 +79,7 @@ class RestaurantService:
 
         if not restaurant:
             return ResponseBuilder.build(
-                ErrorType.RES_404_NOT_FOUND,
-                MessageCode.INVALID_CREDENTIALS,
-                lang
+                ErrorType.RES_404_NOT_FOUND, MessageCode.INVALID_CREDENTIALS, lang
             )
 
         for key, value in data.model_dump(exclude_unset=True).items():
@@ -105,7 +92,7 @@ class RestaurantService:
             ErrorType.SUC_200_OK,
             MessageCode.LOGIN_SUCCESS,
             lang,
-            data=RestaurantResponse.model_validate(restaurant)
+            data=RestaurantResponse.model_validate(restaurant),
         )
 
     @staticmethod
@@ -119,16 +106,12 @@ class RestaurantService:
 
         if not restaurant:
             return ResponseBuilder.build(
-                ErrorType.RES_404_NOT_FOUND,
-                MessageCode.INVALID_CREDENTIALS,
-                lang
+                ErrorType.RES_404_NOT_FOUND, MessageCode.INVALID_CREDENTIALS, lang
             )
 
         await db.delete(restaurant)
         await db.commit()
 
         return ResponseBuilder.build(
-            ErrorType.SUC_200_OK,
-            MessageCode.LOGIN_SUCCESS,
-            lang
+            ErrorType.SUC_200_OK, MessageCode.LOGIN_SUCCESS, lang
         )

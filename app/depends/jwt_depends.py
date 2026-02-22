@@ -1,20 +1,19 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 
-from fastapi import Depends
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
-from fastapi import status
+from fastapi import Depends, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import CONFIG_SETTINGS
 from app.database.postgresql import get_db
 from app.models.main.users import TblUsers
 from app.utils.schemas_utils import CustomHTTPException, JWTPayloadSchema
-from sqlalchemy.ext.asyncio import AsyncSession
+
 
 class JWTService:
-
     def __init__(self):
         self.redis = Redis(
             host=CONFIG_SETTINGS.REDIS_DB_HOST,
@@ -31,7 +30,7 @@ class JWTService:
     def _now(self):
         return datetime.now(timezone.utc)
 
-    def _generate_payload(self, request_uuid: str, expire_minutes: int,role: str):
+    def _generate_payload(self, request_uuid: str, expire_minutes: int, role: str):
         jti = uuid.uuid4().hex
         expire = self._now() + timedelta(minutes=expire_minutes)
 
@@ -42,19 +41,16 @@ class JWTService:
             "aud": self.audience,
             "iat": int(self._now().timestamp()),
             "exp": int(expire.timestamp()),
-            "jti": jti
-
+            "jti": jti,
         }
 
     # ===============================
     # CREATE ACCESS TOKEN
     # ===============================
-    async def create_access_token(self, uuid: str,role: str) -> str:
+    async def create_access_token(self, uuid: str, role: str) -> str:
 
         payload = self._generate_payload(
-            uuid,
-            CONFIG_SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES,
-            role
+            uuid, CONFIG_SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES, role
         )
 
         token = jwt.encode(payload, self.private_key, algorithm="RS256")
@@ -78,12 +74,10 @@ class JWTService:
     # ===============================
     # CREATE REFRESH TOKEN
     # ===============================
-    async def create_refresh_token(self, uuid: str,role: str) -> str:
+    async def create_refresh_token(self, uuid: str, role: str) -> str:
 
         payload = self._generate_payload(
-            uuid,
-            CONFIG_SETTINGS.REFRESH_TOKEN_EXPIRE_MINUTES,
-            role
+            uuid, CONFIG_SETTINGS.REFRESH_TOKEN_EXPIRE_MINUTES, role
         )
 
         token = jwt.encode(payload, self.private_key, algorithm="RS256")
@@ -175,6 +169,8 @@ class JWTService:
 
         await self.redis.delete(f"access:{uuid}")
         await self.redis.delete(f"refresh:{uuid}")
+
+
 security = HTTPBearer()
 jwt_service = JWTService()
 
@@ -197,25 +193,21 @@ async def get_current_user(
     user = await TblUsers.get_by_id(payload.uuid, db)
 
     if not user:
-        raise CustomHTTPException(
-            status_code=401,
-            message="User not found"
-        )
+        raise CustomHTTPException(status_code=401, message="User not found")
 
     if not user.is_active:
-        raise CustomHTTPException(
-            status_code=403,
-            message="Inactive user"
-        )
+        raise CustomHTTPException(status_code=403, message="Inactive user")
 
     return user
 
-async def get_current_admin_user(
-    current_user=Depends(get_current_user)
-):
+
+async def get_current_admin_user(current_user=Depends(get_current_user)):
     if current_user.role != "ADMIN":
-        raise CustomHTTPException(
-            status_code=403,
-            message="Admin access required"
-        )
+        raise CustomHTTPException(status_code=403, message="Admin access required")
+    return current_user
+
+
+async def get_current_customer_user(current_user=Depends(get_current_user)):
+    if current_user.role != "CUSTOMER":
+        raise CustomHTTPException(status_code=403, message="Customer access required")
     return current_user

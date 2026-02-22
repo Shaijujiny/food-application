@@ -1,20 +1,21 @@
 from datetime import datetime
 from typing import Optional
 from uuid import uuid4
-from sqlalchemy import String, Boolean, DateTime, Integer, func
-from sqlalchemy.orm import Mapped, mapped_column
+
+from sqlalchemy import Boolean, DateTime, Integer, String, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base_class import Base
 from app.utils.schemas_utils import CustomModel
 
 
 class RestaurantBaseModel(CustomModel):
-    res_id:Optional[int] = None
+    res_id: Optional[int] = None
     name: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
+    email: Optional[str] = None
     is_active: Optional[bool] = True
 
 
@@ -23,10 +24,7 @@ class TblRestaurants(Base):
     __table_args__ = {"schema": "public"}
 
     res_id: Mapped[int] = mapped_column(
-        "res_id",
-        Integer,
-        primary_key=True,
-        autoincrement=True
+        "res_id", Integer, primary_key=True, autoincrement=True
     )
 
     uuid: Mapped[str] = mapped_column(
@@ -35,39 +33,23 @@ class TblRestaurants(Base):
         default=lambda: str(uuid4()),
         unique=True,
         nullable=False,
-        index=True
+        index=True,
     )
 
-    name: Mapped[str] = mapped_column(
-        "res_name",
-        String(200),
-        nullable=False
-    )
+    name: Mapped[str] = mapped_column("res_name", String(200), nullable=False)
 
-    address: Mapped[str] = mapped_column(
-        "res_address",
-        String(500),
-        nullable=False
-    )
+    address: Mapped[str] = mapped_column("res_address", String(500), nullable=False)
 
-    phone: Mapped[str] = mapped_column(
-        "res_phone",
-        String(20),
-        nullable=False
-    )
+    phone: Mapped[str] = mapped_column("res_phone", String(20), nullable=False)
+
+    email: Mapped[str] = mapped_column("res_email", String(255), nullable=True)
 
     is_active: Mapped[bool] = mapped_column(
-        "res_isActive",
-        Boolean,
-        default=True,
-        nullable=False
+        "res_isActive", Boolean, default=True, nullable=False
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        "res_createdAt",
-        DateTime,
-        default=datetime.utcnow,
-        nullable=False
+        "res_createdAt", DateTime, default=datetime.utcnow, nullable=False
     )
 
     @classmethod
@@ -78,13 +60,11 @@ class TblRestaurants(Base):
         await db.refresh(restaurant)
         return restaurant
 
-
     @classmethod
     async def active_restaurants_count(cls, db: AsyncSession):
-        result = await db.scalar(
-            select(func.count(cls.res_id)).where(cls.is_active == True)
-        )
+        result = await db.scalar(select(func.count(cls.res_id)).where(cls.is_active))
         return result or 0
+
     @classmethod
     async def get_recent(cls, db: AsyncSession, limit: int = 5):
         result = await db.execute(
