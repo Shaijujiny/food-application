@@ -10,10 +10,7 @@ class Settings(BaseSettings):
     """Config Settings for the Application."""
 
     model_config = SettingsConfigDict(
-        env_file="./.env",
-        env_file_encoding="utf-8",
-        case_sensitive=True,
-        extra="allow"
+        env_file="./.env", env_file_encoding="utf-8", case_sensitive=True, extra="allow"
     )
 
     # ==========================================
@@ -28,7 +25,6 @@ class Settings(BaseSettings):
     FASTAPI_DEBUG: bool = True
     DEBUG: bool = True
 
-
     # ==========================================
     # Database Settings
     # ==========================================
@@ -40,16 +36,14 @@ class Settings(BaseSettings):
     POSTGRESQL_DB_POOL_SIZE: int = 10
     POSTGRESQL_DB_MAX_OVERFLOW: int = 20
 
-
     # ==========================================
     # Redis Settings
     # ==========================================
     REDIS_DB_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
-    REDIS_PASS: str ="YOURPASSWORD"
+    REDIS_PASS: str = "YOURPASSWORD"
     SSL_CA_CERTS: str | None = None
-
 
     # ==========================================
     # JWT Settings
@@ -60,14 +54,12 @@ class Settings(BaseSettings):
     APP_JWT_PRIVATE_KEY: str = ""
     APP_JWT_PUBLIC_KEY: str = ""
 
-
     # ==========================================
     # Security / Encryption
     # ==========================================
     ENCRYPTION_KEY: str = "mysecretkey123"
     ALGORITHM: str = "RS256"
     JWT_AUDIENCE: str = "api"
-
 
     # ==========================================
     # CORS Settings

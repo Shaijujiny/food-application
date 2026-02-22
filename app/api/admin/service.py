@@ -202,7 +202,7 @@ class AdminUserService:
         user = await TblUsers.get_by_uuid(user_uuid, db)
         if not user:
             return ResponseBuilder.build(
-                ErrorType.ERR_404_NOT_FOUND, MessageCode.USER_NOT_FOUND, lang
+                ErrorType.RES_404_NOT_FOUND, MessageCode.USER_NOT_FOUND, lang
             )
 
         response_data = UserResponseModel(
@@ -224,7 +224,7 @@ class AdminUserService:
         user = await TblUsers.get_by_uuid(user_uuid, db)
         if not user:
             return ResponseBuilder.build(
-                ErrorType.ERR_404_NOT_FOUND, MessageCode.USER_NOT_FOUND, lang
+                ErrorType.RES_404_NOT_FOUND, MessageCode.USER_NOT_FOUND, lang
             )
 
         updated_user = await user.update(db, req_data)
@@ -247,7 +247,7 @@ class AdminUserService:
         user = await TblUsers.get_by_uuid(user_uuid, db)
         if not user:
             return ResponseBuilder.build(
-                ErrorType.ERR_404_NOT_FOUND, MessageCode.USER_NOT_FOUND, lang
+                ErrorType.RES_404_NOT_FOUND, MessageCode.USER_NOT_FOUND, lang
             )
 
         await user.delete(db)

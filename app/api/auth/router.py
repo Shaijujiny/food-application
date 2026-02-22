@@ -63,5 +63,4 @@ async def logout(lang: str = Depends(get_language)):
         ErrorType.SUC_200_OK,
         MessageCode.LOGIN_SUCCESS,
         lang,
-        message="Logout successful",
     )
